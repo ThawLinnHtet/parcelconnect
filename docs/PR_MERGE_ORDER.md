@@ -1,21 +1,17 @@
-# Implementation PR merge order
+# ParcelConnect pull request merge order
 
-All implementation work is proposed through feature branches. The repository owner performs every PR merge; no merge automation is enabled.
+The repository owner controls every merge. No automation merges PRs, and the implementation agent does not merge them.
 
-Two starting branches target main independently:
+The delivery-domain foundation was merged by the owner as [PR #1](https://github.com/ThawLinnHtet/parcelconnect/pull/1). The remaining review sequence is:
 
-1. `feature/delivery-domain`: domain contracts, mock gateway, and tests.
-2. `feature/supabase-backend`: database schema, permissions, transactional server commands, and backend tests.
+1. `feature/supabase-backend` → `main` (independent backend foundation).
+2. `feature/mock-delivery-app` → `main` (domain is already present in main).
+3. `feature/connected-client` → `feature/mock-delivery-app` (connected operation also requires the backend PR).
+4. `feature/notifications-media` → `feature/connected-client` (push worker and private media need the backend schema).
+5. `feature/portfolio-quality` → `feature/notifications-media`.
 
-The app work is stacked to keep each review focused:
+The app and backend PRs may be reviewed and merged independently. Merge the backend before testing connected Auth, Storage, or push. Then merge the app before its connected-client child, followed by notifications/media and portfolio quality.
 
-3. `feature/mock-delivery-app` targets `feature/delivery-domain`.
-4. `feature/connected-client` targets `feature/mock-delivery-app`; its connected behavior also requires the backend PR.
-5. `feature/notifications-media` targets `feature/connected-client`; its worker also requires the backend schema.
-6. `feature/portfolio-quality` targets `feature/notifications-media`.
+After a parent PR merges, retarget its child to `main` when appropriate and rebase descendants if the parent was squashed. The original domain PR was squashed; the app branch was restacked onto the updated `main` so its PR will not repeat the domain diff. Check each PR's base and diff before merging.
 
-Merge the domain and backend foundations first, then the app stack in order. Review the PR's base before merging. After a parent merges, retarget its child to main if GitHub has not done so automatically. Rebase when needed to resolve changes from the newly merged main and rerun checks.
-
-Use a merge strategy that preserves the shared commits in the stacked history, or restack the descendants after squashing/rebasing a parent. Do not force-push rewritten shared history without coordinating the dependent PRs.
-
-An open PR is not evidence of a deployed backend. Hosted Supabase configuration, platform signing/push credentials, and native hardware validation remain separate setup and acceptance requirements. Consult each PR's validation report for what actually ran.
+An open PR does not indicate a deployed backend. Hosted Supabase configuration, EAS/platform push credentials, and native hardware checks remain separate setup and acceptance requirements. See each PR body for verified coverage.

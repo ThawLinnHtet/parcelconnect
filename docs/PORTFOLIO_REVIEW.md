@@ -13,7 +13,7 @@ This checklist records required review coverage. An unchecked item is not a pass
 ## Mock scenarios
 
 - [ ] Sender books a parcel; recipient confirms the current window; assigned rider picks up, dispatches, and completes the simulated handoff.
-- [ ] Recipient nominates a receiver; pending invitation blocks pickup; acceptance permits coordination; rider never sees the code in delivery records.
+- [ ] Recipient nominates a receiver; pending invitation blocks pickup; acceptance permits coordination; rider never sees the code in delivery records. (Domain tests pass; UI walkthrough remains open.)
 - [ ] Revoke receiver or change window; old confirmation/code becomes unusable.
 - [ ] Invalid, expired, locked, and already-used code states remain distinguishable.
 - [ ] Cancellation before pickup works. Unavailability after pickup blocks final handoff without auto-cancelling or auto-delivering.

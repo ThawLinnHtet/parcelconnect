@@ -35,6 +35,7 @@ These are browser captures of the Expo web app, not native-device screenshots:
 
 - [Mock deliveries](docs/screenshots/mock-deliveries-phone.png)
 - [Recipient handoff](docs/screenshots/mock-recipient-handoff-phone.png)
+- [Completed mock handoff](docs/screenshots/mock-delivered-phone.png)
 - [Design tokens in light mode](docs/screenshots/tokens-light.png)
 - [Design tokens in dark mode](docs/screenshots/tokens-dark.png)
 
