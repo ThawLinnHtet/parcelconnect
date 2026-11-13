@@ -48,7 +48,8 @@ export type DeliveryCommand =
 export type IssuedHandoffCode = { code: string; expiresAt: string; simulated: boolean };
 export type DomainErrorCode = 'forbidden' | 'not_found' | 'invalid_input' | 'invalid_transition' | 'confirmation_required' | 'invitation_expired' | 'code_invalid' | 'code_expired' | 'code_locked' | 'code_revoked' | 'code_used' | 'rate_limited' | 'offline' | 'unavailable';
 export class DeliveryError extends Error {
-  constructor(public code: DomainErrorCode, message: string) { super(message); this.name = 'DeliveryError'; }
+  readonly code: DomainErrorCode;
+  constructor(code: DomainErrorCode, message: string) { super(message); this.name = 'DeliveryError'; this.code = code; }
 }
 export type LoadState<T> =
   | { status: 'loading' }
