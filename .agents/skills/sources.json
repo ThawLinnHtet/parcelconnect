@@ -1,0 +1,12 @@
+{
+  "repository": "https://github.com/expo/skills",
+  "revision": "acc0b21ce09be356b5cf0323482bdfe7db0b7a1e",
+  "skills": [
+    "expo-ui",
+    "expo-native-ui",
+    "expo-design-system",
+    "expo-router",
+    "expo-project-structure"
+  ],
+  "installation": "Project-local complete directory copies, including references and scripts; no global installation."
+}
