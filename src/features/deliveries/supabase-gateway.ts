@@ -11,12 +11,8 @@ function serverError(value: { code: string; message: string }) {
   return new DeliveryError(knownCodes.has(value.code as DomainErrorCode) ? value.code as DomainErrorCode : 'unavailable', value.message);
 }
 
-/** Explicit connected adapter: backend errors never become mock successes. */
-export function createSupabaseGateway(client: SupabaseClient, scope: SessionScope = sharedScope): DeliveryGateway {
-  let stopSubscription: (() => void) | undefined;
-  const listeners = new Set<() => void>();
-  const notify = () => { for (const listener of [...listeners]) listener(); };
-
+/** Shared authenticated API transport for delivery and device-registration adapters. */
+export function createConnectedApi(client: SupabaseClient, scope: SessionScope = sharedScope) {
   async function identity(actor: Actor): Promise<{ session: Session; stamp: SessionStamp }> {
     const stamp = scope.capture(actor.id);
     const { data, error } = await client.auth.getSession();
@@ -60,6 +56,15 @@ export function createSupabaseGateway(client: SupabaseClient, scope: SessionScop
     }
   }
 
+  return request;
+}
+
+/** Explicit connected adapter: backend errors never become mock successes. */
+export function createSupabaseGateway(client: SupabaseClient, scope: SessionScope = sharedScope): DeliveryGateway {
+  const request = createConnectedApi(client, scope);
+  let stopSubscription: (() => void) | undefined;
+  const listeners = new Set<() => void>();
+  const notify = () => { for (const listener of [...listeners]) listener(); };
   return {
     mode: 'connected',
     listPeople: actor => request<Person[]>(actor, 'list_people'),

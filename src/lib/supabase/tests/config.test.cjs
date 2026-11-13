@@ -1,4 +1,5 @@
 const test = require('node:test');
+const { Buffer } = require('node:buffer');
 const assert = require('node:assert/strict');
 const { readSupabaseConfig } = require('../config.ts');
 const jwt = role => `header.${Buffer.from(JSON.stringify({ role })).toString('base64url')}.signature`;

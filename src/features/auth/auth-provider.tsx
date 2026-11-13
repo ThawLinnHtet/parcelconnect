@@ -16,7 +16,7 @@ type AuthContextValue = AuthState & {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (name: string, email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
-  retry: () => Promise<void>;
+  retry: () => Promise<boolean>;
   selectRole: (role: Role) => void;
 };
 const initial: AuthState = { status: supabaseConfiguration.status === 'ready' ? 'loading' : 'unconfigured', session: null, user: null, actor: null, roles: [], error: supabaseConfiguration.status === 'ready' ? null : supabaseConfiguration.message };
@@ -29,11 +29,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const mounted = useRef(true);
   const currentUserId = useRef<string | null>(null);
   const loadSession = useCallback(async (session: Session | null, request: number) => {
-    if (!mounted.current || request !== generation.current) return;
+    if (!mounted.current || request !== generation.current) return false;
     if (!session) {
       currentUserId.current = null; sessionScope.setIdentity(null);
       setState({ ...initial, status: 'signedOut', error: null });
-      return;
+      return false;
     }
     try {
       const client = getSupabaseClient();
@@ -41,30 +41,33 @@ export function AuthProvider({ children }: PropsWithChildren) {
       if (userError || !userData.user) throw userError ?? new Error('This session is no longer valid. Sign in again.');
       const { data: profile, error: profileError } = await client.from('profiles').select('id,display_name,is_rider').eq('id', userData.user.id).single();
       if (profileError || !profile) throw profileError ?? new Error('Your account profile is not available. Please try again.');
-      if (!mounted.current || request !== generation.current) return;
+      if (!mounted.current || request !== generation.current) return false;
       const roles: Role[] = profile.is_rider === true ? ['rider', 'sender', 'recipient', 'receiver'] : ['sender', 'recipient', 'receiver'];
       currentUserId.current = userData.user.id;
       sessionScope.setIdentity(userData.user.id);
       setState(previous => ({ status: 'signedIn', session, user: userData.user,
         actor: { id: userData.user.id, role: previous.actor?.id === userData.user.id && roles.includes(previous.actor.role) ? previous.actor.role : roles[0] }, roles, error: null }));
+      return true;
     } catch (error) {
-      if (!mounted.current || request !== generation.current) return;
+      if (!mounted.current || request !== generation.current) return false;
       currentUserId.current = null; sessionScope.setIdentity(null);
       setState({ ...initial, status: 'error', error: message(error) });
+      return false;
     }
   }, []);
   const retry = useCallback(async () => {
-    if (supabaseConfiguration.status !== 'ready') return;
+    if (supabaseConfiguration.status !== 'ready') return false;
     const request = ++generation.current;
     setState(previous => ({ ...previous, status: 'loading', error: null }));
     try {
       const { data, error } = await getSupabaseClient().auth.getSession();
       if (error) throw error;
-      await loadSession(data.session, request);
+      return await loadSession(data.session, request);
     } catch (error) {
-      if (!mounted.current || request !== generation.current) return;
+      if (!mounted.current || request !== generation.current) return false;
       currentUserId.current = null; sessionScope.setIdentity(null);
       setState({ ...initial, status: 'error', error: message(error) });
+      return false;
     }
   }, [loadSession]);
 
@@ -76,7 +79,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     const { data: { subscription } } = client.auth.onAuthStateChange((_event, session) => {
       const request = ++generation.current;
       // Account changes hide old data immediately, before deferred SDK work.
-      if (session?.user.id !== state.user?.id) currentUserId.current = null; sessionScope.setIdentity(null);
+      currentUserId.current = prepareSessionChange(sessionScope, currentUserId.current, session?.user.id ?? null);
       setState(previous => previous.user?.id === session?.user.id && session
         ? previous : { ...initial, status: 'loading', error: null });
       clearTimeout(timer);
@@ -87,7 +90,18 @@ export function AuthProvider({ children }: PropsWithChildren) {
       else client.auth.stopAutoRefresh();
     });
     if (Platform.OS === 'web' || AppState.currentState === 'active') client.auth.startAutoRefresh();
-    void retry();
+    const initialGeneration = generation.current;
+    void client.auth.getSession().then(({ data, error }) => {
+      if (!mounted.current || generation.current !== initialGeneration) return;
+      if (error) {
+        currentUserId.current = null; sessionScope.setIdentity(null);
+        setState({ ...initial, status: 'error', error: message(error) });
+      } else void loadSession(data.session, ++generation.current);
+    }).catch((error: unknown) => {
+      if (!mounted.current || generation.current !== initialGeneration) return;
+      currentUserId.current = null; sessionScope.setIdentity(null);
+      setState({ ...initial, status: 'error', error: message(error) });
+    });
     return () => {
       mounted.current = false; generation.current += 1; clearTimeout(timer);
       subscription.unsubscribe(); lifecycle.remove(); client.auth.stopAutoRefresh(); sessionScope.setIdentity(null);
@@ -97,13 +111,13 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const signIn = useCallback(async (email: string, password: string) => {
     const { error } = await getSupabaseClient().auth.signInWithPassword({ email: email.trim(), password });
     if (error) throw error;
-    await retry();
+    if (!await retry()) throw new Error('The session or account profile could not be verified. Retry account validation.');
   }, [retry]);
   const signUp = useCallback(async (name: string, email: string, password: string) => {
     const { data, error } = await getSupabaseClient().auth.signUp({ email: email.trim(), password, options: { data: { display_name: name.trim() } } });
     if (error) throw error;
     if (!data.session) throw new Error('This project requires email confirmation. Disable Confirm Email for portfolio signup, then sign in with a configured demo account.');
-    await retry();
+    if (!await retry()) throw new Error('The session or account profile could not be verified. Retry account validation.');
   }, [retry]);
   const signOut = useCallback(async () => {
     const { data, error: sessionError } = await getSupabaseClient().auth.getSession();
