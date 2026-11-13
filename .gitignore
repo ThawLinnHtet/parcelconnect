@@ -50,3 +50,6 @@ example
 
 # Design review captures (published copies live in docs/screenshots)
 .impeccable/review/
+
+# Supabase CLI local state
+supabase/.temp/
