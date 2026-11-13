@@ -358,8 +358,13 @@ create policy entrance_update on storage.objects for update to authenticated usi
 create policy entrance_delete on storage.objects for delete to authenticated using(bucket_id='entrance-photos' and (storage.foldername(name))[2]=(select auth.uid())::text and exists(select 1 from public.deliveries d where d.id::text=(storage.foldername(name))[1] and d.recipient_id=(select auth.uid()) and d.status not in('delivered','cancelled')));
 
 -- Realtime is a foreground invalidation signal; clients refetch after reconnect.
-do $$ begin
+do $$ declare table_name text;
+begin
  if exists(select 1 from pg_publication where pubname='supabase_realtime') then
- alter publication supabase_realtime add table public.deliveries,public.delivery_events,public.notifications;
+   foreach table_name in array array['deliveries','receiver_authorizations','delivery_events','notifications'] loop
+     if not exists(select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename=table_name) then
+       execute format('alter publication supabase_realtime add table public.%I',table_name);
+     end if;
+   end loop;
  end if;
 end $$;
