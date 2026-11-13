@@ -24,6 +24,9 @@ export async function acquirePushToken(requestPermission = true): Promise<Acquir
   return { state: 'ready', token: token.data };
 }
 export function watchNotificationTaps(onTap: (data: unknown) => void) {
+  Notifications.setNotificationHandler({ handleNotification: async () => ({
+    shouldShowBanner: true, shouldShowList: true, shouldPlaySound: false, shouldSetBadge: false,
+  }) });
   let active = true;
   const subscription = Notifications.addNotificationResponseReceivedListener(response => {
     if (active) onTap(response.notification.request.content.data);

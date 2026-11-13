@@ -106,3 +106,32 @@ test('picked bytes must actually be JPEG data', () => {
   assert.throws(() => decodePickedJpeg('aGVsbG8='), /JPEG/);
   assert.equal(decodePickedJpeg('/9j/AA==').bytes.byteLength, 4);
 });
+
+test('failed token unlink keeps its association so a logout retry can remove it', async () => {
+  let attempts = 0;
+  const lifecycle = createTokenLifecycle({ currentUserId: () => 'alice', register: async () => {},
+    unregister: async () => { if (++attempts === 1) throw new Error('Network unavailable'); } });
+  await lifecycle.register('alice', 'device', async () => ({ state: 'ready', token: TOKEN }));
+  await assert.rejects(lifecycle.disconnect(), /Network unavailable/);
+  await lifecycle.disconnect();
+  assert.equal(attempts, 2);
+});
+test('same device token registration is deduplicated for the same account', async () => {
+  let registrations = 0;
+  const lifecycle = createTokenLifecycle({ currentUserId: () => 'alice', register: async () => { registrations++; }, unregister: async () => {} });
+  const acquire = async () => ({ state: 'ready' as const, token: TOKEN });
+  await lifecycle.register('alice', 'device', acquire);
+  await lifecycle.register('alice', 'device', acquire);
+  assert.equal(registrations, 1);
+});
+test('an account change after upload cannot attach the staged photo', async () => {
+  let user = 'alice', attached = false;
+  const removed: string[][] = [];
+  const service = createEntrancePhotoService({ upload: async () => { user = 'bob'; return { error: null }; },
+    remove: async paths => { removed.push(paths); return { error: null }; },
+    createSignedUrl: async () => ({ data: null, error: null }),
+  }, () => user, () => 'photo');
+  await assert.rejects(service.uploadAndAttach('parcel', { bytes: new Uint8Array([1]).buffer, mime: 'image/jpeg' }, async () => { attached = true; }), /account changed/);
+  assert.equal(attached, false);
+  assert.deepEqual(removed, [['parcel/alice/photo.jpg']]);
+});
