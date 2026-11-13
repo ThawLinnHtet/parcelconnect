@@ -46,3 +46,7 @@ No real deliveries, live GPS service, payments, or measured reduction in failed 
 ## References and attribution
 
 Scaffolded from the official `expo-template-default@58.0.34` using `@expo/agent-cli`; resolved Expo version at setup: 58.0.25. Selected skills come from [expo/skills](https://github.com/expo/skills), MIT licensed; see `.agents/skills/EXPO-LICENSE` and `sources.json`.
+
+## Foundation validation
+
+Verified on 2026-11-13: TypeScript, ESLint, Expo dependency compatibility, and production bundle exports for Android, iOS, and web passed. Bundling is not a device runtime test; no physical-device or emulator run is claimed. Small starter fixes add Expo CSS type declarations, correct the web tab-button ref type, and use a hydration-safe external-store snapshot for the web color scheme.
