@@ -39,7 +39,7 @@ export function DeliveryDetailScreen() {
   return <Page>
     <View style={styles.row}><AppText variant="label" style={styles.grow}>{d.reference}</AppText><StatusLabel label={statusText(d.status)} tone={statusTone(d.status)} /></View>
     <Section title={d.description}><AppText variant="title">{windowText(d.window)}</AppText><AppText color="textSecondary">Requested delivery window · {d.size} parcel</AppText></Section>
-    {error && <Notice text={error} danger />}{pending && <Notice text="Saving this change…" />}
+    {!!error && <Notice text={error} danger />}{pending && <Notice text="Saving this change…" />}
     {!terminal && <Panel>
       <StatusLabel tone={confirmed ? 'success' : 'attention'} label={confirmed ? 'Availability confirmed' : 'Handoff confirmation needed'} />
       <AppText variant="heading">{recipient ? 'Will you be there?' : 'Coordinate the handoff'}</AppText>

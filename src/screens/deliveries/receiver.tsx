@@ -17,7 +17,7 @@ export function ReceiverScreen() {
   const d=data.delivery;
   if(actor.id!==d.recipientId||actor.role!=='recipient')return <Page><Notice text="Only the recipient can nominate a receiver. Accept your invitation from delivery details." /></Page>;
   const candidates=data.people.filter(person=>person.id!==actor.id&&person.roles.includes('receiver'));
-  return <Page><AppText variant="title">Choose a trusted receiver</AppText><AppText color="textSecondary">Invite an existing demo account. They must accept for this delivery window.</AppText>{message&&<Notice text={message} danger />}
+  return <Page><AppText variant="title">Choose a trusted receiver</AppText><AppText color="textSecondary">Invite an existing demo account. They must accept for this delivery window.</AppText>{!!message&&<Notice text={message} danger />}
     {d.receiver&&<Panel><AppText variant="heading">Current authorization</AppText><AppText>{data.people.find(p=>p.id===d.receiver?.receiverId)?.displayName??'Selected receiver'} · {d.receiver.status}</AppText>
       <AppText color="textSecondary">Revoking this authorization also invalidates its handoff code.</AppText>
       {['pending','accepted'].includes(d.receiver.status)&&<Action title="Revoke receiver authorization" secondary disabled={pending} onPress={()=>void run({type:'revoke_receiver',deliveryId:id})} testID="revoke-receiver" />}

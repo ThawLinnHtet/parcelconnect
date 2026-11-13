@@ -21,7 +21,7 @@ export function BookingReviewScreen() {
       <AppText variant="label">Drop-off</AppText><AppText>{draft.dropoff.address}</AppText>
       <AppText variant="label">Requested window</AppText><AppText>{dateTime(draft.window.start)} to {dateTime(draft.window.end)}</AppText>
       <AppText variant="label">Entrance</AppText><AppText>{draft.entrance?.instructions || 'No instructions added.'}</AppText>
-    </Panel>{error && <Notice text={error} danger />}
+    </Panel>{!!error && <Notice text={error} danger />}
     <Action title={pending ? 'Creating booking…' : 'Create demo booking'} disabled={pending} onPress={() => void submit()} testID="create-booking" />
     <Action title="Edit booking" secondary disabled={pending} onPress={() => router.back()} />
   </Page>;

@@ -27,7 +27,7 @@ export function BookingFormScreen() {
   }, [description, pickup, dropoff, start, end, size, instructions, setDraft]);
   if (actor.role !== 'sender') return <Page><Notice text="Switch to the sender perspective to book a parcel." /></Page>;
   return <Page><Section title="Where is it going?"><AppText color="textSecondary">Use fictional addresses for this portfolio demo.</AppText></Section>
-    {error && <Notice text={error} danger />}
+    {!!error && <Notice text={error} danger />}
     <Field label="Parcel description" value={description} onChange={setDescription} />
     <Choice label="Parcel size" value={size} onChange={setSize} options={['small','medium','large'].map(value => ({label: value[0].toUpperCase()+value.slice(1), value: value as BookingInput['size']}))} />
     <Field label="Pickup address" value={pickup} onChange={setPickup} multiline />

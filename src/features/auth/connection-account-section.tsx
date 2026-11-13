@@ -24,7 +24,7 @@ export function ConnectionAccountSection() {
       <Notice text="This view uses your signed-in identity. Changing the account view never grants server permissions." />
       <Choice label="Account view" value={auth.actor?.role ?? 'sender'} onChange={auth.selectRole}
         options={auth.roles.map(role => ({ value: role, label: role[0].toUpperCase() + role.slice(1) }))} testID="connected-view-picker" />
-      {error && <Notice text={error} danger />}
+      {!!error && <Notice text={error} danger />}
       <Action title={busy ? 'Signing out…' : 'Sign out'} onPress={() => { void signOut(); }} disabled={busy} />
       <Action title="Switch to the mock demo" secondary onPress={() => { connection.useMock(); router.replace('/'); }} disabled={busy} />
     </> : <>
