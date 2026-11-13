@@ -24,6 +24,7 @@ export function createMockGateway(options: MockGatewayOptions = {}): MockDeliver
   let issuances = new Map<string, number[]>();
   let sequence = 0;
   let online = true;
+  let generation = 0;
   const listeners = new Set<() => void>();
   const nextId = (prefix: string) => `${prefix}-${++sequence}`;
   const timestamp = () => new Date(now()).toISOString();
@@ -36,7 +37,13 @@ export function createMockGateway(options: MockGatewayOptions = {}): MockDeliver
   }
   seed();
   async function ready() {
+    const operation = generation;
     if (options.latencyMs) await new Promise(resolve => setTimeout(resolve, options.latencyMs));
+    return operation;
+  }
+  function ensureCurrent(operation: number) {
+    // Check after the caller's await as well: even zero-latency promises yield.
+    if (operation !== generation) fail('unavailable', 'The demo was reset. Refresh and try again.');
     if (!online) fail('offline', 'You are offline. Reconnect and try again.');
   }
   function identify(actor: Actor) {
@@ -106,28 +113,28 @@ export function createMockGateway(options: MockGatewayOptions = {}): MockDeliver
     mode: 'mock',
     setOnline(value) { online = value; emit(); },
     subscribe(listener) { listeners.add(listener); return () => { listeners.delete(listener); }; },
-    async resetDemo() { seed(); online = true; emit(); },
-    async listPeople(actor) { await ready(); identify(actor); return copy(DEMO_PEOPLE); },
+    async resetDemo() { generation += 1; seed(); online = true; emit(); },
+    async listPeople(actor) { const operation = await ready(); ensureCurrent(operation); identify(actor); return copy(DEMO_PEOPLE); },
     async listDeliveries(actor) {
-      await ready(); identify(actor);
+      const operation = await ready(); ensureCurrent(operation); identify(actor);
       return [...deliveries.values()].filter(delivery => canAccessDelivery(actor, delivery, now())).map(delivery => redact(actor, delivery));
     },
     async listAvailableJobs(actor) {
-      await ready(); identify(actor); if (actor.role !== 'rider') fail('forbidden', 'Only a rider can discover available jobs.');
+      const operation = await ready(); ensureCurrent(operation); identify(actor); if (actor.role !== 'rider') fail('forbidden', 'Only a rider can discover available jobs.');
       return [...deliveries.values()].filter(delivery => delivery.status === 'booked' && !delivery.riderId).map(delivery => copy({
         id: delivery.id, reference: delivery.reference, description: delivery.description, size: delivery.size,
         window: delivery.window, status: delivery.status,
       }));
     },
-    async getDelivery(actor, id) { await ready(); identify(actor); const delivery = find(id); authorize(actor, delivery); return redact(actor, delivery); },
-    async listNotifications(actor) { await ready(); identify(actor); return copy(notifications.filter(item => item.userId === actor.id)); },
+    async getDelivery(actor, id) { const operation = await ready(); ensureCurrent(operation); identify(actor); const delivery = find(id); authorize(actor, delivery); return redact(actor, delivery); },
+    async listNotifications(actor) { const operation = await ready(); ensureCurrent(operation); identify(actor); return copy(notifications.filter(item => item.userId === actor.id)); },
     async markNotificationRead(actor, id) {
-      await ready(); identify(actor); const notification = notifications.find(item => item.id === id && item.userId === actor.id);
+      const operation = await ready(); ensureCurrent(operation); identify(actor); const notification = notifications.find(item => item.id === id && item.userId === actor.id);
       if (!notification) fail('not_found', 'Notification not found.');
       notification.readAt ??= timestamp(); emit();
     },
     async issueHandoffCode(actor, id): Promise<IssuedHandoffCode> {
-      await ready(); identify(actor); const delivery = find(id); authorize(actor, delivery); mutable(delivery);
+      const operation = await ready(); ensureCurrent(operation); identify(actor); const delivery = find(id); authorize(actor, delivery); mutable(delivery);
       const holder = issueAllowed(actor, delivery);
       const recent = (issuances.get(id) ?? []).filter(time => now() - time < 900_000);
       if (recent.length >= 5 || (recent.length > 0 && now() - recent[recent.length - 1] < 30_000)) fail('rate_limited', 'Wait before issuing another demonstration code.');
@@ -140,7 +147,7 @@ export function createMockGateway(options: MockGatewayOptions = {}): MockDeliver
       return { code, expiresAt: new Date(expiresAt).toISOString(), simulated: true };
     },
     async execute(actor, command: DeliveryCommand) {
-      await ready(); identify(actor);
+      const operation = await ready(); ensureCurrent(operation); identify(actor);
       if (command.type === 'book') {
         if (actor.role !== 'sender') fail('forbidden', 'Only a sender can book a parcel.');
         const input = command.input; validateWindow(input.window);

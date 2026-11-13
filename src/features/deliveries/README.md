@@ -4,7 +4,7 @@ This feature defines the data contract used by mock and future connected screens
 
 - `createMockGateway({ now?, latencyMs? })` creates an isolated demonstration data source. `now` returns epoch milliseconds and makes scenario tests reproducible.
 - `DEMO_ACTORS`, `DEMO_PEOPLE`, and `DEMO_DELIVERY_ID` identify the fictional perspectives and the initial booked parcel. Actor roles are not authentication credentials.
-- Gateway methods return promises and defensive copies. `subscribe` is a local invalidation signal; `setOnline(false)` demonstrates an explicit offline failure; `resetDemo()` restores the seed and reconnects.
+- Gateway methods return promises and defensive copies. `subscribe` is a local invalidation signal; `setOnline(false)` demonstrates an explicit offline failure; `resetDemo()` restores the seed, reconnects, and invalidates all in-flight reads/commands with an explicit `unavailable` error.
 - Lists and details require a valid perspective and participant relationship. Unassigned riders discover a limited job summary; pending receivers receive redacted location/entrance fields.
 - Availability is independent of transport status. Window acknowledgements, authorization expiry, and receiver acceptance control whether pickup, dispatch, or final verification can proceed.
 - The adapter's handoff code is deliberately simulated, deterministic, and private to its in-memory challenge map. It never appears in ordinary delivery records. This is not secure backend verification.

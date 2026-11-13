@@ -183,3 +183,28 @@ test('switching back to recipient availability notifies the revoked receiver', a
   assert.ok(inbox[inbox.length - 1].title.includes('revoked'));
   await rejectsCode(gateway.getDelivery(actors.receiver, id), 'forbidden');
 });
+
+
+test('reset invalidates pending commands and reads before they reach the fresh seed', async () => {
+  const gateway = createMockGateway({ now: () => start, latencyMs: 30 });
+  const pendingChange = gateway.execute(actors.recipient, command('respond_availability', { available: true }));
+  const pendingRead = gateway.getDelivery(actors.recipient, id);
+  const changeRejected = rejectsCode(pendingChange, 'unavailable');
+  const readRejected = rejectsCode(pendingRead, 'unavailable');
+  await gateway.resetDemo();
+  await Promise.all([changeRejected, readRejected]);
+  const fresh = await gateway.getDelivery(actors.recipient, id);
+  assert.equal(fresh.status, 'booked');
+  assert.equal(fresh.availability.status, 'pending');
+  assert.equal(fresh.events.length, 1);
+  assert.equal((await gateway.listNotifications(actors.recipient)).length, 1);
+});
+
+test('reset invalidation also covers a zero-latency command awaiting its microtask', async () => {
+  const gateway = createMockGateway({ now: () => start });
+  const pending = gateway.execute(actors.recipient, command('respond_availability', { available: true }));
+  const rejected = rejectsCode(pending, 'unavailable');
+  await gateway.resetDemo();
+  await rejected;
+  assert.equal((await gateway.getDelivery(actors.recipient, id)).availability.status, 'pending');
+});
