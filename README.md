@@ -29,6 +29,7 @@ The scaffold runs without backend credentials. Later, copy `.env.example` to `.e
 
 - [Product requirements](docs/PRD.md): scope, roles, state machine, access rules, notifications, milestones, acceptance criteria.
 - [Agent instructions](AGENTS.md): coding conventions, security constraints, validation.
+- [Design system proposal](docs/DESIGN_SYSTEM.md): inspected Mobbin references, proposed tokens, component states, and recipient screen layout. Draft for discussion; app code is unchanged.
 - [Expo skills](docs/EXPO_SKILLS.md): installed skills and optional official catalog.
 - `src/app/`: Expo Router screens/layouts; `src/components/`: shared UI; `src/constants/theme.ts`: existing theme.
 - `.agents/skills/`: complete copies of the five chosen Expo skills and their references/scripts, with upstream revision recorded in `sources.json`.
