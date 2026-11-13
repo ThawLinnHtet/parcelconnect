@@ -1,0 +1,21 @@
+project_id = "parcelconnect"
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 17
+[auth]
+enabled = true
+site_url = "parcelconnect://"
+additional_redirect_urls = ["http://localhost:8081", "http://localhost:8082"]
+[auth.email]
+enable_signup = true
+enable_confirmations = false
+[functions.delivery-api]
+verify_jwt = false
+[functions.push-worker]
+verify_jwt = false
