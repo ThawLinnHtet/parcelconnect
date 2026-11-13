@@ -14,9 +14,10 @@ export function WelcomeScreen() {
     <Panel><AppText variant="heading">Explore the portfolio demo</AppText>
       <AppText>Try the sender, recipient, rider, and trusted receiver perspectives. All people and deliveries are fictional.</AppText>
       <Action title="Open delivery demo" onPress={() => router.push('/deliveries')} testID="open-demo" />
+      <Action title="Connect a Supabase account" secondary onPress={() => router.push('/sign-in')} testID="open-sign-in" />
       <AppText variant="supporting" color="textSecondary">No account needed. No real deliveries, live tracking, or remote notifications.</AppText>
     </Panel>
     <Action title="View design system" secondary onPress={() => router.push('/design-system')} />
-    <AppText color="textSecondary" style={{ marginTop: Spacing.three }}>The connected service is a separate integration. This demo never asks for your real address.</AppText>
+    <AppText color="textSecondary" style={{ marginTop: Spacing.three }}>The connected account uses the configured Supabase project. The portfolio demo never asks for your real address.</AppText>
   </Page>;
 }
