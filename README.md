@@ -38,6 +38,7 @@ Token-gallery verification: TypeScript, ESLint, SDK compatibility, contrast calc
 ## Project guide
 
 - [Product requirements](docs/PRD.md): scope, roles, state machine, access rules, notifications, milestones, acceptance criteria.
+- [Implementation plan](docs/IMPLEMENTATION_PLAN.md): ordered milestones, dependencies, acceptance criteria, and the first coding task.
 - [Agent instructions](AGENTS.md): coding conventions, security constraints, validation.
 - [Implemented design system](DESIGN.md): token reference and component usage.
 - [Design system proposal](docs/DESIGN_SYSTEM.md): inspected Mobbin references, proposed tokens, component states, and recipient screen layout. Original proposal with implementation status; the token gallery now implements the approved direction.
