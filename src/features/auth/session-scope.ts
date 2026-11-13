@@ -28,3 +28,9 @@ export class SessionScope {
   }
 }
 export const sessionScope = new SessionScope();
+
+/** Same-user token refresh preserves subscriptions; an identity change tears them down. */
+export function prepareSessionChange(scope: SessionScope, previousUserId: string | null, nextUserId: string | null) {
+  if (previousUserId !== nextUserId) scope.setIdentity(null);
+  return nextUserId;
+}

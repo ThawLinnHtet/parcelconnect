@@ -7,7 +7,7 @@ import { getSupabaseClient, supabaseConfiguration } from '@/lib/supabase/client'
 
 import { runBeforeSignOut } from './session-lifecycle';
 import { notifyForeground } from './foreground-events';
-import { sessionScope } from './session-scope';
+import { prepareSessionChange, sessionScope } from './session-scope';
 
 type AuthStatus = 'unconfigured' | 'loading' | 'signedOut' | 'signedIn' | 'error';
 type AuthState = { status: AuthStatus; session: Session | null; user: User | null; actor: Actor | null; roles: Role[]; error: string | null };
@@ -57,9 +57,15 @@ export function AuthProvider({ children }: PropsWithChildren) {
     if (supabaseConfiguration.status !== 'ready') return;
     const request = ++generation.current;
     setState(previous => ({ ...previous, status: 'loading', error: null }));
-    const { data, error } = await getSupabaseClient().auth.getSession();
-    if (error) { if (request === generation.current) setState({ ...initial, status: 'error', error: message(error) }); return; }
-    await loadSession(data.session, request);
+    try {
+      const { data, error } = await getSupabaseClient().auth.getSession();
+      if (error) throw error;
+      await loadSession(data.session, request);
+    } catch (error) {
+      if (!mounted.current || request !== generation.current) return;
+      currentUserId.current = null; sessionScope.setIdentity(null);
+      setState({ ...initial, status: 'error', error: message(error) });
+    }
   }, [loadSession]);
 
   useEffect(() => {
