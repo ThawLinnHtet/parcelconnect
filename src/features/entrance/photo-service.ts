@@ -28,8 +28,10 @@ export function createEntrancePhotoService(storage: EntranceStorage, currentUser
       }
     },
     async signedUrl(path: string) {
-      if (!currentUserId()) throw new Error('Sign in to view this entrance photo.');
+      const userId = currentUserId();
+      if (!userId) throw new Error('Sign in to view this entrance photo.');
       const result = await storage.createSignedUrl(path, 60);
+      if (currentUserId() !== userId) throw new Error('The account changed while the photo was loading.');
       if (result.error || !result.data) throw new Error('This photo is unavailable or your access has changed.');
       return result.data.signedUrl;
     },

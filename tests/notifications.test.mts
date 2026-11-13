@@ -135,3 +135,11 @@ test('an account change after upload cannot attach the staged photo', async () =
   assert.equal(attached, false);
   assert.deepEqual(removed, [['parcel/alice/photo.jpg']]);
 });
+test('an account change during signed URL creation discards the old photo URL', async () => {
+  let user = 'alice';
+  const service = createEntrancePhotoService({ upload: async () => ({ error: null }),
+    remove: async () => ({ error: null }),
+    createSignedUrl: async () => { user = 'bob'; return { data: { signedUrl: 'private-url' }, error: null }; },
+  }, () => user, () => 'photo');
+  await assert.rejects(service.signedUrl('parcel/alice/photo.jpg'), /account changed/);
+});

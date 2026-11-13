@@ -80,7 +80,7 @@ export function Field({ label, value, onChange, hint, multiline, keyboardType, t
         style={{ width: '100%', padding: Spacing.twelve, borderColor: c.inputOutline, borderWidth: Border.thin, borderRadius: Radius.small }}
         textStyle={{ ...Typography.body, color: c.text }} />
     </Host>
-    {hint && <AppText variant="supporting" color="textSecondary">{hint}</AppText>}
+    {!!hint && <AppText variant="supporting" color="textSecondary">{hint}</AppText>}
   </View>;
 }
 export function Perspective() {

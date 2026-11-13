@@ -46,7 +46,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       currentUserId.current = userData.user.id;
       sessionScope.setIdentity(userData.user.id);
       setState(previous => ({ status: 'signedIn', session, user: userData.user,
-        actor: { id: userData.user.id, role: previous.actor?.id === userData.user.id && roles.includes(previous.actor.role) ? previous.actor.role : roles[0] }, roles, error: null }));
+        actor: { id: userData.user.id, role: previous.actor?.id === userData.user.id && previous.actor && roles.includes(previous.actor.role) ? previous.actor.role : roles[0] }, roles, error: null }));
       return true;
     } catch (error) {
       if (!mounted.current || request !== generation.current) return false;

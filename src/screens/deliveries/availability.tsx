@@ -22,7 +22,7 @@ export function AvailabilityScreen() {
   if(!d||error)return <Page><Notice text={error??'Delivery unavailable.'} danger /></Page>;
   if(actor.id!==d.recipientId||actor.role!=='recipient')return <Page><Notice text="Only the recipient can change availability." /></Page>;
   return <Page><AppText variant="title">Can you receive this parcel?</AppText><AppText color="textSecondary">{windowText(d.window)}</AppText>
-    {message&&<Notice text={message} danger={failed} />}<Panel><AppText>Current response: {d.availability.status.replaceAll('_',' ')}</AppText>
+    {!!message&&<Notice text={message} danger={failed} />}<Panel><AppText>Current response: {d.availability.status.replaceAll('_',' ')}</AppText>
       <Action title={pending?'Saving…':"I'll be there"} onPress={()=>void run({type:'respond_availability',deliveryId:id,available:true})} disabled={pending} testID="confirm-availability" />
       <Action title="I won't be there" secondary onPress={()=>void run({type:'respond_availability',deliveryId:id,available:false})} disabled={pending} testID="unavailable" />
       <AppText variant="supporting" color="textSecondary">A receiver invitation is not a confirmation until the receiver accepts.</AppText>

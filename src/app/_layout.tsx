@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { WebTokenStyles } from '@/components/ui/web-token-styles';
 import { AuthProvider } from '@/features/auth/auth-provider';
 import { ConnectionProvider } from '@/features/auth/connection-provider';
+import { PushProvider } from '@/features/notifications/push-provider';
 import { AppearanceProvider, useAppearance } from '@/hooks/use-theme';
 
 void SplashScreen.preventAutoHideAsync();
@@ -35,5 +36,5 @@ function AppLayout() {
   </ThemeProvider>;
 }
 export default function RootLayout() {
-  return <AppearanceProvider><AuthProvider><ConnectionProvider><AppLayout /></ConnectionProvider></AuthProvider></AppearanceProvider>;
+  return <AppearanceProvider><AuthProvider><ConnectionProvider><PushProvider><AppLayout /></PushProvider></ConnectionProvider></AuthProvider></AppearanceProvider>;
 }

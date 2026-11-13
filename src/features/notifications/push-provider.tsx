@@ -37,30 +37,40 @@ export function PushProvider({ children }: PropsWithChildren) {
   const auth = useAuth();
   const { mode } = useConnection();
   const demo = useDemo();
-  const authRef = useRef(auth); authRef.current = auth;
+  const authRef = useRef(auth);
+  const getCurrentAuth = useCallback(() => authRef.current, []);
+  useEffect(() => { authRef.current = auth; }, [auth]);
   const operation = useRef(0);
   const [status, setStatus] = useState<PushStatus>('idle');
   const [message, setMessage] = useState(messages.idle);
   const [pendingTap, setPendingTap] = useState<unknown>(null);
   const seen = useRef(new Set<string>());
   const mounted = useRef(true);
-  const [lifecycle] = useState(() => createTokenLifecycle({
-    currentUserId: () => authRef.current.user?.id ?? null,
-    register: async (deviceId, token) => {
-      const actor = authRef.current.actor;
-      if (!actor) throw new Error('Sign in before enabling notifications.');
-      await createConnectedApi(getSupabaseClient()).request(actor, 'register_push_token', { deviceId, token });
-    },
-    unregister: async deviceId => {
-      const actor = authRef.current.actor;
-      if (!actor) throw new Error('The previous account must be signed in to remove its device token.');
-      await createConnectedApi(getSupabaseClient()).request(actor, 'unregister_push_token', { deviceId });
-    },
-  }));
+  const [lifecycle, setLifecycle] = useState<ReturnType<typeof createTokenLifecycle> | null>(null);
+  useEffect(() => {
+    const service = createTokenLifecycle({
+      currentUserId: () => getCurrentAuth().user?.id ?? null,
+      register: async (deviceId, token) => {
+        const actor = getCurrentAuth().actor;
+        if (!actor) throw new Error('Sign in before enabling notifications.');
+        await createConnectedApi(getSupabaseClient())(actor, 'register_push_token', { deviceId, token });
+      },
+      unregister: async deviceId => {
+        const actor = getCurrentAuth().actor;
+        if (!actor) throw new Error('The previous account must be signed in to remove its device token.');
+        await createConnectedApi(getSupabaseClient())(actor, 'unregister_push_token', { deviceId });
+      },
+    });
+    // This is an imperative serial IO service, initialized after mount rather than read by render.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLifecycle(service);
+  }, [getCurrentAuth]);
+  const invalidatePending = useCallback(() => { operation.current += 1; }, []);
   const show = useCallback((next: PushStatus, detail = messages[next]) => {
     if (mounted.current) { setStatus(next); setMessage(detail); }
   }, []);
   const disable = useCallback(async () => {
+    if (!lifecycle) return;
     const request = ++operation.current;
     show('busy');
     try {
@@ -72,53 +82,55 @@ export function PushProvider({ children }: PropsWithChildren) {
     }
   }, [lifecycle, show]);
   const enable = useCallback(async () => {
-    const userId = authRef.current.user?.id;
+    const userId = getCurrentAuth().user?.id;
     if (mode !== 'connected' || !userId) { show('idle', 'Sign in to connected mode before enabling remote alerts.'); return; }
+    if (!lifecycle) { show('error'); return; }
     const request = ++operation.current;
     show('busy');
     try {
       const deviceId = await installationId();
-      if (request !== operation.current || authRef.current.user?.id !== userId) return;
+      if (request !== operation.current || getCurrentAuth().user?.id !== userId) return;
       const result = await lifecycle.register(userId, deviceId, () => acquirePushToken(true));
       if (request === operation.current) show(result.state);
     } catch (error) {
       if (request === operation.current) show('error', error instanceof Error ? error.message : messages.error);
     }
-  }, [lifecycle, mode, show]);
+  }, [getCurrentAuth, lifecycle, mode, show]);
   useEffect(() => {
     mounted.current = true;
     const unsubscribe = registerBeforeSignOut(async () => { await disable(); seen.current.clear(); setPendingTap(null); });
     const stop = watchNotificationTaps(setPendingTap);
-    return () => { mounted.current = false; ++operation.current; unsubscribe(); stop(); };
-  }, [disable]);
+    return () => { mounted.current = false; invalidatePending(); unsubscribe(); stop(); };
+  }, [disable, invalidatePending]);
   useEffect(() => {
     if (mode !== 'connected') { void disable().catch(() => {}); return; }
+    if (!lifecycle) return;
     return watchPushTokenChanges(() => {
       // Token rotation does not prompt; only refresh a previously granted token.
-      const userId = authRef.current.user?.id;
+      const userId = getCurrentAuth().user?.id;
       if (!userId || status !== 'registered') return;
       void installationId().then(deviceId => lifecycle.register(userId, deviceId, () => acquirePushToken(false)))
         .catch(error => show('error', error instanceof Error ? error.message : messages.error));
     });
-  }, [mode, lifecycle, disable, show, status]);
+  }, [mode, lifecycle, disable, getCurrentAuth, show, status]);
   useEffect(() => {
     if (mode !== 'connected' || auth.status !== 'signedIn' || !auth.user || !pendingTap || demo.gateway.mode !== 'connected') return;
     let active = true;
     const userId = auth.user.id;
     void resolveNotificationTarget(pendingTap, deliveryId => demo.gateway.getDelivery(demo.actor, deliveryId)).then(async target => {
-      if (!active || authRef.current.user?.id !== userId) return;
+      if (!active || getCurrentAuth().user?.id !== userId) return;
       setPendingTap(null);
       if (!target) return;
       const key = `${userId}:${target.notificationId}`;
       if (seen.current.has(key)) return;
       seen.current.add(key);
       try { await demo.gateway.markNotificationRead(demo.actor, target.notificationId); } catch { /* Detail will reauthorize on load. */ }
-      if (active && authRef.current.user?.id === userId) router.push({ pathname: '/deliveries/[id]', params: { id: target.deliveryId } });
+      if (active && getCurrentAuth().user?.id === userId) router.push({ pathname: '/deliveries/[id]', params: { id: target.deliveryId } });
     }).catch(() => {
       if (active) { setPendingTap(null); show('error', 'This delivery is no longer available to the signed-in account.'); }
     });
     return () => { active = false; };
-  }, [pendingTap, auth.status, auth.user, mode, demo.gateway, demo.actor, show]);
+  }, [pendingTap, auth.status, auth.user, mode, demo.gateway, demo.actor, getCurrentAuth, show]);
   return <PushContext.Provider value={{ status, message, enable, disable }}>{children}</PushContext.Provider>;
 }
 export function usePushNotifications() {
