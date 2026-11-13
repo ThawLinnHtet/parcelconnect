@@ -1,1 +1,2 @@
-export { DesignSystemScreen as default } from '@/screens/design-system';
+import { Redirect } from 'expo-router';
+export default function ExploreRedirect() { return <Redirect href="/design-system" />; }
