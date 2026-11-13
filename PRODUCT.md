@@ -28,7 +28,7 @@ The portfolio scope excludes payments, real courier operations, route optimizati
 
 ## Brand commitments
 
-The working app name is ParcelConnect; the GitHub repository is ThawLinnHtet/parcelconnect (renamed from pickora). The user requested Mobbin as a design reference and chose to discuss a design specification before implementing components or a preview screen. No logo, palette, or final visual direction has been approved.
+The working app name is ParcelConnect; the GitHub repository is ThawLinnHtet/parcelconnect (renamed from pickora). The user requested Mobbin as a design reference and chose to discuss a design specification before implementing components or a preview screen. On 2026-11-13, the user approved keeping the proposed deep teal brand color. The specification records its light/dark action values. Supporting tokens, component details, and screen composition remain proposals; no logo has been approved.
 
 ## Evidence on hand
 

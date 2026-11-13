@@ -1,12 +1,12 @@
 # ParcelConnect design system proposal
 
-Version 0.1 | 2026-11-13 | Draft for discussion
+Version 0.2 | 2026-11-13 | Deep teal brand color approved; components and layouts proposed
 
-This is a specification, not an implemented component library. Palette, component details, and screen composition below are proposals. App code and runtime dependencies are unchanged. The user chose to review a specification before building.
+This is a specification, not an implemented component library. The user approved keeping the proposed deep teal brand color on 2026-11-13: `#0B6256` for light-mode actions and `#83D6C1` for dark-mode actions. Component details, supporting tokens, and screen composition remain proposals. App code and runtime dependencies are unchanged. The user chose to review a specification before building.
 
 ## 1. Direction
 
-My opinion is to use neutral surfaces, a deep teal action color, system typography, and native controls. The main screen should make the next handoff action obvious. A recipient who has not replied sees the availability request before tracking details.
+Deep teal is the approved action color. The proposed surrounding system uses neutral surfaces, system typography, and native controls. The main screen should make the next handoff action obvious. A recipient who has not replied sees the availability request before tracking details.
 
 The app's distinctive feature is its handoff coordination. Express that through an availability panel and clear receiver states. Avoid making a decorative map the first screen's main content when the MVP only has a status timeline and entrance guidance.
 
@@ -202,10 +202,10 @@ Secondary text and input outlines were checked on `#FFFFFF` in light appearance 
 
 ## 8. Implementation sequence after discussion
 
-1. Settle the proposed palette and recipient screen ordering. Record the accepted system in DESIGN.md when implementing; this proposal alone is not an approval.
+1. Keep the approved deep teal action color and review the supporting palette and recipient screen ordering. Record the accepted system in DESIGN.md when implementing; color approval does not approve every component or layout.
 2. Extend the existing theme and establish typography/spacing usage. Preserve compatibility while retiring starter-only examples deliberately.
 3. Implement the recipient detail screen and component examples in light/dark appearances, using @expo/ui where suitable and thin Expo Router routes.
 4. Add only the patterns required by the booking, receiver, and rider handoff flows. Keep sample actions labeled as demo behavior.
 5. Verify native layouts, text scaling, screen-reader order, keyboard behavior, denial/error recovery, and status/code privacy before connecting the backend.
 
-No component library, theme values, routes, backend, or notifications were implemented for this specification. No native screenshots or user-test results are claimed. Review focus: the proposed teal action palette and placing availability before tracking details.
+No component library, theme values, routes, backend, or notifications were implemented for this specification. No native screenshots or user-test results are claimed. Remaining review focus: supporting tokens, component behavior, and placing availability before tracking details.
