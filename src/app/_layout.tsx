@@ -5,7 +5,9 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
 import { WebTokenStyles } from '@/components/ui/web-token-styles';
-import { DemoProvider } from '@/features/demo/demo-provider';
+import { AuthProvider } from '@/features/auth/auth-provider';
+import { ConnectionProvider } from '@/features/auth/connection-provider';
+import { PushProvider } from '@/features/notifications/push-provider';
 import { AppearanceProvider, useAppearance } from '@/hooks/use-theme';
 
 void SplashScreen.preventAutoHideAsync();
@@ -18,6 +20,8 @@ function AppLayout() {
     <Stack screenOptions={{ headerStyle: { backgroundColor: colors.surface }, headerTintColor: colors.text,
       contentStyle: { backgroundColor: colors.background }, headerBackButtonDisplayMode: 'minimal' }}>
       <Stack.Screen name="index" options={{ title: 'ParcelConnect' }} />
+      <Stack.Screen name="sign-in" options={{ title: 'Sign in' }} />
+      <Stack.Screen name="sign-up" options={{ title: 'Create account' }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="book/index" options={{ title: 'Book a parcel' }} />
       <Stack.Screen name="book/review" options={{ title: 'Review booking' }} />
@@ -32,5 +36,5 @@ function AppLayout() {
   </ThemeProvider>;
 }
 export default function RootLayout() {
-  return <AppearanceProvider><DemoProvider><AppLayout /></DemoProvider></AppearanceProvider>;
+  return <AppearanceProvider><AuthProvider><ConnectionProvider><PushProvider><AppLayout /></PushProvider></ConnectionProvider></AuthProvider></AppearanceProvider>;
 }
