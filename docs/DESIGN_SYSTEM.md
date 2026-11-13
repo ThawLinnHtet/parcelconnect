@@ -1,8 +1,8 @@
 # ParcelConnect design system proposal
 
-Version 0.2 | 2026-11-13 | Deep teal brand color approved; components and layouts proposed
+Version 0.3 | 2026-11-13 | Deep teal approved; foundations and gallery implemented; remaining patterns proposed
 
-This is a specification, not an implemented component library. The user approved keeping the proposed deep teal brand color on 2026-11-13: `#0B6256` for light-mode actions and `#83D6C1` for dark-mode actions. Component details, supporting tokens, and screen composition remain proposals. App code and runtime dependencies are unchanged. The user chose to review a specification before building.
+This document records the original proposal. Implementation update: the tokens, appearance provider, shared text/status primitives, and interactive gallery at `/explore` now exist. The full component library and delivery workflows remain planned. The user approved keeping the proposed deep teal brand color on 2026-11-13: `#0B6256` for light-mode actions and `#83D6C1` for dark-mode actions. Supporting tokens and the gallery composition are now implemented choices derived from this proposal; this does not make them separately user-approved brand decisions. The full component contracts and delivery screen composition below remain proposals unless identified as implemented. Runtime dependencies are unchanged. [DESIGN.md](../DESIGN.md) records the current implementation; `src/constants/theme.ts` remains the runtime source of truth.
 
 ## 1. Direction
 
@@ -30,7 +30,7 @@ Continue `src/constants/theme.ts` as the sole theme entry point. Do not add a co
 
 ### Color roles
 
-Use native semantic colors for ordinary surfaces, labels, and separators where the SDK supports them. The static values below specify the proposed preview/fallback appearance. Native semantic colors may differ with system settings; verify their rendered contrast on devices. Brand action colors are deliberate light/dark pairs.
+The current implementation uses explicit static light/dark palettes for surfaces, labels, separators, and brand actions. The table below matches implemented roles; `theme.ts` also defines element/selected backgrounds and disabled pairs. Native semantic colors remain a future consideration and are not currently implemented.
 
 | Role | Light | Dark | Intended use |
 | --- | --- | --- | --- |
@@ -62,25 +62,26 @@ Availability and transport status remain separate data fields. "Availability con
 
 ### Typography
 
-Use the OS system face: San Francisco on iOS and the default Android system face. No downloaded font is needed for this proposal. Use native text styles where available and preserve system text scaling in React Native. The numbers are baseline sizes, not fixed rendered heights.
+The implementation uses the system face with no downloaded font. `AppText` applies the shared variants and preserves React Native's default font scaling. Values below are numeric baseline logical units, not fixed rendered heights or native CSS pixels. Navigation-owned screen-title behavior remains planned for feature screens.
 
-| Role | iOS baseline | Android baseline | Use |
+| Variant | Baseline size / line height | Weight | Implementation use |
 | --- | --- | --- | --- |
-| Screen title | Native large/inline title | Native app-bar title | Navigation-owned title |
-| Delivery window | 28 pt, semibold | 28 sp, medium | Main time range |
-| Section heading | 20 pt, semibold | 20 sp, medium | Availability, receiver, entrance |
-| Body | 17 pt, regular | 16 sp, regular | Instructions and explanations |
-| Action label | 17 pt, semibold | 16 sp, medium | Primary button |
-| Supporting text | 15 pt, regular | 14 sp, regular | Timestamps, descriptions |
-| Code | 28 pt, monospaced | 28 sp, monospaced | Handoff code on authorized screen only |
+| display | 36 / 42 | 600 | Wide gallery heading |
+| title | 28 / 36 | 600 | Compact gallery heading, delivery window |
+| heading | 20 / 28 | 600 | Gallery sections, availability question |
+| body | iOS 17; Android/web 16 / 24 | 400 | Instructions and explanations |
+| action | iOS 17; Android/web 16 / 24 | 600 | Action labels |
+| supporting | iOS 15; Android/web 14 / 20 | 400 | Timestamps and descriptions |
+| label | 14 / 20 | 600 | Status and row labels |
+| code | 28 / 36 | 500, platform monospace | Defined token; no code-entry component yet |
 
-Use comfortable line height, about 1.35 to 1.5 times the base body size. Important instructions may wrap; do not truncate addresses or delivery problems. Use tabular numerals for codes and time values. Avoid all-caps paragraphs and arbitrary letter spacing.
+Important instructions can wrap. Native large-text behavior and authorized handoff-code formatting still require implementation and device verification.
 
 ### Spacing and shape
 
-Preserve the starter spacing scale: 2, 4, 8, 16, 24, 32, and 64 logical units. Use 16 for compact phone screen gutters; allow 24 on wider layouts. Use 8 within a label/value pair, 16 between related rows, and 24 or 32 between sections. Add a 12-unit token only if repeated layouts need it.
+The implemented spacing scale is 2, 4, 8, 12, 16, 24, 32, 48, and 64 logical units. The gallery uses 16-unit compact gutters and 32-unit wide gutters, with a 960-unit two-column threshold. React Native values are numeric logical units; web projections use CSS pixels.
 
-Proposed custom container radii: 8 for small supporting elements, 12 for image corners, 16 for a task panel. Native buttons, sheets, switches, and pickers keep their platform shapes. Radius is not a reason to put every row inside a card. Avoid decorative shadows; native sheets and navigation surfaces own their elevation.
+Implemented gallery radii: 8 for status labels, 12 for the availability panel and brand swatch, and 16 for the delivery container. The 999-unit pill token is defined but unused in the gallery. Native buttons, sheets, switches, and pickers keep their platform shapes. Radius is not a reason to put every row inside a card. Avoid decorative shadows; native sheets and navigation surfaces own their elevation.
 
 All interactive hit regions should be at least 48 by 48 logical units. This exceeds the iOS 44 pt minimum and matches the Android 48 dp target. A button's height may grow with text. Badge text is not itself a touch target.
 
@@ -92,7 +93,7 @@ Keep native push, back, sheet, and selection behavior. Any custom state feedback
 
 ## 4. Component and pattern contracts
 
-These are intended behavior contracts. Build only the shared abstractions that repeated screens need. Native controls should not acquire wrappers merely to become part of the design system.
+These are intended behavior contracts, not a completed component inventory. `AppText` and `StatusLabel` are shared primitives. The gallery uses platform-native `@expo/ui` Button/Picker controls and local delivery compositions; labeled fields, code entry, full loading/disabled states, and the remaining patterns are planned. Build only the shared abstractions that repeated screens need. Native controls should not acquire wrappers merely to become part of the design system.
 
 | Component/pattern | Content and states | Implementation direction |
 | --- | --- | --- |
@@ -181,7 +182,7 @@ The rider's corresponding detail screen uses the same window, route, guidance, a
 - Use visible labels; placeholders are examples, not labels. Icons and touch targets need meaningful accessible names.
 - Photos are optional; equivalent text guidance is always possible. Location permission denial permits typed guidance and manual pin selection.
 - Verify the palette in both appearances and increased-contrast settings. Color contrast alone does not establish overall accessibility.
-- A future preview should show default, loading, error, disabled, and large-text examples in light and dark appearances. Web captures are useful previews but are not evidence of native conformance.
+- The current gallery shows awaiting, confirmed, receiver-pending, and offline-error demo states in light/dark appearances. Loading, disabled, and native large-text examples remain future work. Web captures are useful previews but are not evidence of native conformance.
 
 ## 7. Contrast calculations
 
@@ -208,4 +209,8 @@ Secondary text and input outlines were checked on `#FFFFFF` in light appearance 
 4. Add only the patterns required by the booking, receiver, and rider handoff flows. Keep sample actions labeled as demo behavior.
 5. Verify native layouts, text scaling, screen-reader order, keyboard behavior, denial/error recovery, and status/code privacy before connecting the backend.
 
-No component library, theme values, routes, backend, or notifications were implemented for this specification. No native screenshots or user-test results are claimed. Remaining review focus: supporting tokens, component behavior, and placing availability before tracking details.
+The theme tokens, text/status primitives, appearance provider, and `/explore` gallery have now been implemented. Appearance follows the system by default; light/dark overrides are held in memory. The gallery supports local availability confirmation/reset, receiver pending/reset, and offline error/reset. Home remains the Expo starter. Backend services, notifications, and the full delivery flow have not been implemented.
+
+Actual Expo web browser previews are saved as `docs/screenshots/tokens-light.png`, `tokens-dark.png` (1440 × 1120), and `mobile-light.png`, `mobile-dark.png` (430 × 1100). These are desktop and narrow web viewport captures, not iOS or Android screenshots. Review found no material visual issues in those captures. Typecheck, lint, SDK compatibility, actual color-pair contrast calculations, browser actions/overflow checks, and JavaScript exports for Android/iOS/web passed. The bundle check used unminified JavaScript with bytecode disabled; it does not establish native runtime behavior.
+
+Native rendering, system accessibility text sizes, VoiceOver/TalkBack, and device interaction remain untested. No native conformance or usability-test results are claimed.

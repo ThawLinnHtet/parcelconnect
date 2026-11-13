@@ -47,3 +47,6 @@ example
 .env.*
 !.env.example
 .expo-agent/
+
+# Design review captures (published copies live in docs/screenshots)
+.impeccable/review/

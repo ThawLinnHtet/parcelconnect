@@ -2,7 +2,7 @@
 
 ## Product intent and scope
 
-Read docs/PRD.md before changing behavior. This is a mobile portfolio project for coordinating parcel handoffs. Core roles are sender, recipient, rider, and a scoped trusted receiver. Prioritize availability confirmation, entrance guidance, and secure one-time handoff verification. No real courier operations or payments are in scope. Clearly label simulated tracking, notifications, and mock data.
+Read docs/PRD.md before changing behavior and DESIGN.md before adding UI. This is a mobile portfolio project for coordinating parcel handoffs. Core roles are sender, recipient, rider, and a scoped trusted receiver. Prioritize availability confirmation, entrance guidance, and secure one-time handoff verification. No real courier operations or payments are in scope. Clearly label simulated tracking, notifications, and mock data.
 
 The current foundation is an Expo starter, not the completed MVP. Implement milestones incrementally and report what is real versus planned. Avoid unnecessary approval pauses for authorized reversible work; do not provision paid services or publish releases without authorization.
 
@@ -30,7 +30,7 @@ Use referenced files as needed. Preserve upstream references/scripts and attribu
 
 - src/app contains routes/layouts only; keep feature logic outside route files.
 - src/screens: screen bodies; src/components: reusable UI; src/features: domain logic; src/lib: service clients; src/hooks: shared hooks.
-- Extend src/constants/theme.ts rather than creating parallel theme files. Use semantic light/dark tokens, consistent spacing/type, and explicit loading/disabled/error states.
+- Extend src/constants/theme.ts rather than creating parallel theme files. It exports Colors, Spacing, Typography, Radius, Border, Motion, Interaction, Layout, and IconSize. Use AppText and StatusLabel for their shared roles, useTheme for current colors, and useAppearance for the system/light/dark override. DESIGN.md documents the implemented system; runtime token values stay in the theme source. Use explicit loading/disabled/error states.
 - Use kebab-case filenames, typed props, and the @/ alias. Avoid any and avoid broad abstractions before repeated use.
 - Support Android and iOS, safe areas, keyboard behavior, large text, accessible labels, and reduced motion. Large delivery feeds use virtualized lists.
 - For native config, edit app.json/config plugins. Do not hand-edit generated ios/android directories.

@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-13T06:42:36.363080+00:00",
+  "title": "Design System: ParcelConnect",
+  "extensions": {
+    "motion": [
+      {
+        "name": "feedback",
+        "value": "160ms",
+        "purpose": "Defined in Motion.duration; not connected to a custom animation."
+      },
+      {
+        "name": "change",
+        "value": "220ms",
+        "purpose": "Defined in Motion.duration; not connected to a custom animation."
+      },
+      {
+        "name": "presentation",
+        "value": "320ms",
+        "purpose": "Defined in Motion.duration; not connected to a custom animation."
+      },
+      {
+        "name": "easing",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Defined in Motion; not connected to a custom animation."
+      },
+      {
+        "name": "reducedMotionDuration",
+        "value": "0ms",
+        "purpose": "Defined token. The scoped web fallback separately removes button transitions when reduced motion is requested."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wideBreakpoint",
+        "value": "960px",
+        "purpose": "Web projection of the numeric logical-unit gallery threshold."
+      }
+    ],
+    "implementation": {
+      "source": "src/constants/theme.ts",
+      "lengthUnits": "Frontmatter and snippets are web CSS projections. Native styles use numeric logical units with system text scaling.",
+      "appearancePersistence": "memory only",
+      "componentPreviews": "StatusLabel projections only; SVGs represent symbol intent. Native Button/Picker are platform-owned and are not recreated here.",
+      "tonalRamps": "No implemented tonal ramps; none synthesized.",
+      "verification": "Actual Expo web previews and interactions reviewed. No native runtime or assistive-technology validation."
+    }
+  },
+  "components": [
+    {
+      "name": "Attention status (light web projection)",
+      "kind": "chip",
+      "refersTo": "status-attention-light",
+      "description": "Noninteractive projection of the shared StatusLabel. Inline SVG represents the native symbol; it is not an extracted platform glyph.",
+      "html": "<span class=\"ds-status-attention\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 18 18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" aria-hidden=\"true\"><circle cx=\"9\" cy=\"9\" r=\"7\"/><path d=\"M9 8v5M9 5v.1\"/></svg><span>Needs a reply</span></span>",
+      "css": ".ds-status-attention { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; background: #FFF2D9; color: #915B08; font: 600 14px/20px -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, system-ui, sans-serif; }"
+    },
+    {
+      "name": "Information status (light web projection)",
+      "kind": "chip",
+      "refersTo": "status-information-light",
+      "description": "Noninteractive projection of the shared StatusLabel. Inline SVG represents the native symbol; it is not an extracted platform glyph.",
+      "html": "<span class=\"ds-status-information\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 18 18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" aria-hidden=\"true\"><circle cx=\"9\" cy=\"9\" r=\"7\"/><path d=\"M9 8v5M9 5v.1\"/></svg><span>In transit</span></span>",
+      "css": ".ds-status-information { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; background: #EAF1FF; color: #2457A6; font: 600 14px/20px -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, system-ui, sans-serif; }"
+    },
+    {
+      "name": "Success status (light web projection)",
+      "kind": "chip",
+      "refersTo": "status-success-light",
+      "description": "Noninteractive projection of the shared StatusLabel. Inline SVG represents the native symbol; it is not an extracted platform glyph.",
+      "html": "<span class=\"ds-status-success\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 18 18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" aria-hidden=\"true\"><circle cx=\"9\" cy=\"9\" r=\"7\"/><path d=\"m5 9 3 3 5-5\"/></svg><span>Confirmed</span></span>",
+      "css": ".ds-status-success { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; background: #E6F5ED; color: #16674A; font: 600 14px/20px -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, system-ui, sans-serif; }"
+    },
+    {
+      "name": "Danger status (light web projection)",
+      "kind": "chip",
+      "refersTo": "status-danger-light",
+      "description": "Noninteractive projection of the shared StatusLabel. Inline SVG represents the native symbol; it is not an extracted platform glyph.",
+      "html": "<span class=\"ds-status-danger\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 18 18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" aria-hidden=\"true\"><circle cx=\"9\" cy=\"9\" r=\"7\"/><path d=\"M9 8v5M9 5v.1\"/></svg><span>Needs attention</span></span>",
+      "css": ".ds-status-danger { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; background: #FDECEF; color: #B42332; font: 600 14px/20px -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, system-ui, sans-serif; }"
+    }
+  ],
+  "narrative": {
+    "overview": "This captures the implemented foundations and `/explore` gallery as of 2026-11-13. Deep teal is the user-approved action color. Supporting tokens and the gallery composition are implementation choices derived from the proposal, not separate user-approved brand decisions. No named creative metaphor or logo has been approved.\n\nThe current interface uses system typography, neutral surfaces, and written status labels. Availability is separate from transport status. The gallery demonstrates fictional handoff states; Home is still the Expo starter and the full component library and delivery workflows remain planned.",
+    "keyCharacteristics": [
+      "Deep teal actions in both appearances.",
+      "System typography and platform controls.",
+      "Status conveyed by a written label, symbol, and color."
+    ],
+    "rules": [],
+    "dos": [
+      "Do import shared values from `src/constants/theme.ts` and resolve appearance through `useTheme()`.",
+      "Do pair status color with a written label and symbol.",
+      "Do label fictional data and local actions as demo behavior."
+    ],
+    "donts": [
+      "Don't treat availability confirmation as delivery completion.",
+      "Don't describe web browser captures as native iOS or Android validation.",
+      "Don't treat the gallery as a complete component library or connected delivery workflow."
+    ]
+  }
+}

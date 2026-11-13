@@ -12,7 +12,7 @@ Senders, recipients, riders, and authorized trusted receivers. The immediate aud
 
 ## Product purpose
 
-Coordinate a parcel handoff before dispatch: confirm the recipient's availability, provide entrance guidance, authorize an alternative receiver, and verify receipt with a one-time code. The full product remains planned; the repository currently contains an Expo starter and documentation.
+Coordinate a parcel handoff before dispatch: confirm the recipient's availability, provide entrance guidance, authorize an alternative receiver, and verify receipt with a one-time code. The full product remains planned; the repository contains an Expo starter, implemented design tokens, an interactive design preview, and documentation.
 
 ## Stack
 
@@ -28,11 +28,11 @@ The portfolio scope excludes payments, real courier operations, route optimizati
 
 ## Brand commitments
 
-The working app name is ParcelConnect; the GitHub repository is ThawLinnHtet/parcelconnect (renamed from pickora). The user requested Mobbin as a design reference and chose to discuss a design specification before implementing components or a preview screen. On 2026-11-13, the user approved keeping the proposed deep teal brand color. The specification records its light/dark action values. Supporting tokens, component details, and screen composition remain proposals; no logo has been approved.
+The working app name is ParcelConnect; the GitHub repository is ThawLinnHtet/parcelconnect (renamed from pickora). The user requested Mobbin as a design reference and chose to discuss a design specification before implementing components or a preview screen. On 2026-11-13, the user approved keeping the proposed deep teal brand color. The specification records its light/dark action values. The requested token implementation and gallery now make the supporting palette and component treatment reviewable in code. Full delivery screens remain planned; no logo has been approved.
 
 ## Evidence on hand
 
-The PRD and AGENTS.md capture scope and engineering constraints. docs/DESIGN_SYSTEM.md records a proposed design system and the iOS Mobbin screens inspected. There are no native screen captures or usability-test results for this proposal.
+The PRD and AGENTS.md capture scope and engineering constraints. docs/DESIGN_SYSTEM.md records a proposed design system and the iOS Mobbin screens inspected. Browser previews of the token gallery are available under docs/screenshots. There are no native device captures or usability-test results.
 
 ## Product principles
 
