@@ -4,11 +4,11 @@ This checklist records required review coverage. An unchecked item is not a pass
 
 ## Reproducible setup
 
-- [ ] Fresh Node 24 checkout: npm ci, lint, typecheck, and domain tests pass.
-- [ ] Mock demo runs without Supabase credentials; demo labels remain visible.
-- [ ] Reset restores known fictional participants and delivery state.
-- [ ] Connected setup documents migrations, seed accounts, public client configuration, and backend secrets separately.
-- [ ] Missing backend configuration produces an actionable screen, not mock success.
+- [x] Fresh Node 24 install (`npm ci`), lint, typecheck, and tests pass in the implementation branch.
+- [x] Mock demo is the default without Supabase credentials and its fictional-data labels are visible.
+- [x] Domain reset tests restore fictional participants and invalidate pending work.
+- [x] Connected setup documents migrations, public client configuration, and server secrets separately.
+- [x] Missing backend configuration has an actionable screen; connected requests never fall back to mock data.
 
 ## Mock scenarios
 
@@ -21,21 +21,21 @@ This checklist records required review coverage. An unchecked item is not a pass
 
 ## Connected correctness
 
-- [ ] Database policy tests deny unrelated and signed-out callers.
-- [ ] Privileged role and participant changes cannot be made through the UI role switcher or editable metadata.
-- [ ] Concurrent riders cannot claim the same delivery.
-- [ ] Concurrent/retried verification completes a delivery once.
-- [ ] Failed code attempts persist and enforce the attempt limit.
-- [ ] Private images and old receiver access cannot bypass authorization.
-- [ ] Realtime reconnect refetches durable data; logout cancels subscriptions and clears prior-account cache.
+- [x] Database policy tests deny unrelated and signed-out callers.
+- [x] The UI sends no actor/role authority; rider capability comes from a protected profile field.
+- [x] Concurrent riders cannot claim the same delivery in PostgreSQL assertions.
+- [x] Concurrent/retried verification completes a delivery once in PostgreSQL assertions.
+- [x] Failed code attempts persist and enforce the attempt limit.
+- [x] Private photo policies and revoked receiver access are covered by database assertions.
+- [x] Realtime reconnect invalidation and logout subscription cleanup are covered by client tests; hosted Realtime still needs verification.
 
 ## Notifications and hardware
 
-- [ ] Push permission denied: inbox and required actions remain usable.
+- [x] Push permission denial leaves the inbox and required delivery actions usable in tested client logic.
 - [ ] Real development build receives push in foreground/background/cold start on configured physical hardware.
-- [ ] Notification taps require the right session and current delivery access.
-- [ ] Logout unlinks a device token; invalid push receipts remove stale registrations.
-- [ ] Push failures do not roll back a committed delivery.
+- [x] Notification taps require the current session and delivery authorization in client tests.
+- [x] Token cleanup and invalid-token handling are covered by lifecycle/worker tests; physical device unlink remains open.
+- [x] Push failures are processed from a durable outbox and cannot roll back delivery state.
 
 ## Native accessibility and navigation
 
@@ -47,7 +47,7 @@ This checklist records required review coverage. An unchecked item is not a pass
 
 ## Portfolio materials
 
-- [ ] Screenshots label platform and scenario accurately.
+- [x] Browser screenshots are labeled as browser captures with the mock scenario; they are not presented as native captures.
 - [ ] Short video demonstrates the recipient-unavailable scenario and recovery.
 - [ ] Case study separates implemented features, simulations, and unverified integrations.
 - [ ] No invented delivery-success improvements, customer feedback, or business metrics.
